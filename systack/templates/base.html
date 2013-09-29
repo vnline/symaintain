@@ -1,0 +1,113 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<!-- Mirrored from responsivewebinc.com/premium/macadmin/ by HTTrack Website Copier/3.x [XR&CO'2013], Thu, 08 Aug 2013 06:53:43 GMT -->
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <!-- Title and other stuffs -->
+  <title>{% block title %}{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="shouyou">
+  <meta name="keywords" content="maintain">
+  <meta name="author" content="vnline">
+
+  <!-- Stylesheets -->
+  <link href="{{STATIC_URL}}style/bootstrap.css" rel="stylesheet">
+  <!-- Font awesome icon -->
+  <link rel="stylesheet" href="{{STATIC_URL}}style/font-awesome.css">
+  <!-- jQuery UI -->
+  <link rel="stylesheet" href="{{STATIC_URL}}style/jquery-ui.css">
+  <!-- Calendar -->
+  <link rel="stylesheet" href="{{STATIC_URL}}style/fullcalendar.css">
+  <!-- prettyPhoto -->
+  <link rel="stylesheet" href="{{STATIC_URL}}style/prettyPhoto.css">
+  <!-- Star rating -->
+  <link rel="stylesheet" href="{{STATIC_URL}}style/rateit.css">
+  <!-- Date picker -->
+  <link rel="stylesheet" href="{{STATIC_URL}}style/bootstrap-datetimepicker.min.css">
+  <link rel="stylesheet" href="{{STATIC_URL}}style/datetimepicker.css">
+  <!-- CLEditor -->
+  <link rel="stylesheet" href="{{STATIC_URL}}style/jquery.cleditor.css">
+  <!-- Uniform -->
+  <link rel="stylesheet" href="{{STATIC_URL}}style/uniform.default.css">
+  <!-- Bootstrap toggle -->
+  <link rel="stylesheet" href="{{STATIC_URL}}style/bootstrap-toggle-buttons.css">
+  <!-- less -->
+  <link rel="stylesheet/less" href="{{STATIC_URL}}less/datetimepicker.less">
+  <!-- Main stylesheet -->
+  <link href="{{STATIC_URL}}style/style.css" rel="stylesheet">
+  <!-- Widgets stylesheet -->
+  <link href="{{STATIC_URL}}style/widgets.css" rel="stylesheet">
+  <!-- Responsive style (from Bootstrap) -->
+  <link href="{{STATIC_URL}}style/bootstrap-responsive.css" rel="stylesheet">
+   {% block extracss %}{% endblock %}
+  <!-- HTML5 Support for IE -->
+  <!--[if lt IE 9]>
+  <script src="js/html5shim.js"></script>
+  <![endif]-->
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="{{STATIC_URL}}img/favicon/favicon.png">
+
+</head>
+<body>
+<div class="content">
+	{% block header %}
+	    {% include 'common/nav.html'%}
+	{% endblock %}
+	{% block sidebar %}
+        {% include "common/sidebar.html" %}
+    {% endblock %}
+    {% block mainbar %}
+        {% include "common/mainbar.html" %}
+    {% endblock %}
+    {% block content %}
+    {% endblock %}
+</div>
+{% include "common/footer.html" %}
+{% block js %}
+
+{% endblock %}
+<!-- JS -->
+<script src="{{STATIC_URL}}js/jquery.js"></script> <!-- jQuery -->
+<script src="{{STATIC_URL}}js/bootstrap.js"></script> <!-- Bootstrap -->
+<script src="{{STATIC_URL}}js/jquery-ui-1.9.2.custom.min.js"></script> <!-- jQuery UI -->
+<script src="{{STATIC_URL}}js/fullcalendar.min.js"></script> <!-- Full Google Calendar - Calendar -->
+<script src="{{STATIC_URL}}js/jquery.rateit.min.js"></script> <!-- RateIt - Star rating -->
+<script src="{{STATIC_URL}}js/jquery.prettyPhoto.js"></script> <!-- prettyPhoto -->
+
+<!-- jQuery Flot -->
+<script src="{{STATIC_URL}}js/excanvas.min.js"></script>
+<script src="{{STATIC_URL}}js/jquery.flot.js"></script>
+<script src="{{STATIC_URL}}js/jquery.flot.resize.js"></script>
+<script src="{{STATIC_URL}}js/jquery.flot.pie.js"></script>
+<script src="{{STATIC_URL}}js/jquery.flot.stack.js"></script>
+
+<!-- jQuery Notification - Noty -->
+<script src="{{STATIC_URL}}js/jquery.noty.js"></script> <!-- jQuery Notify -->
+<script src="{{STATIC_URL}}js/themes/default.js"></script> <!-- jQuery Notify -->
+<script src="{{STATIC_URL}}js/layouts/bottom.js"></script> <!-- jQuery Notify -->
+<!-- <script src="{{STATIC_URL}}js/layouts/topRight.js"></script> <!-- jQuery Notify -->
+<script src="{{STATIC_URL}}js/layouts/top.js"></script> <!-- jQuery Notify -->
+<!-- jQuery Notification ends -->
+
+<script src="{{STATIC_URL}}js/sparklines.js"></script> <!-- Sparklines -->
+<script src="{{STATIC_URL}}js/jquery.cleditor.min.js"></script> <!-- CLEditor -->
+<script src="{{STATIC_URL}}js/bootstrap-datetimepicker.min.js"></script> <!-- Date picker -->
+<script src="{{STATIC_URL}}js/jquery.uniform.min.js"></script> <!-- jQuery Uniform -->
+<script src="{{STATIC_URL}}js/jquery.toggle.buttons.js"></script> <!-- Bootstrap Toggle -->
+<script src="{{STATIC_URL}}js/filter.js"></script> <!-- Filter for support page -->
+<script src="{{STATIC_URL}}js/custom.js"></script> <!-- Custom codes -->
+<script src="{{STATIC_URL}}js/charts.js"></script> <!-- Custom codes -->
+<script type="text/javascript">
+   $(".form_datetime").datetimepicker({
+      format: "yyyy-mm-dd hh:ii",
+      autoclose: true,
+      todayBtn: true,
+      startDate: "2013-09-24 10:00",
+      minuteStep: 10
+      });
+</script>
+</body>
+</html>
