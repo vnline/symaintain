@@ -24,7 +24,7 @@ class Schedule(models.Model):
 class Hot_update(models.Model):
     target = models.CharField(max_length=20)
     files = models.FileField(upload_to ='hotupdate/%Y/%m/',blank = True)
-    hot_status = models.BooleanField()
+    result = models.BooleanField()
     deployed_by = models.CharField(max_length=20)
     mtime = models.DateTimeField(auto_now = True)
 
@@ -53,7 +53,7 @@ class Deploy(models.Model):
 class Operation(models.Model):
     target = models.CharField(max_length=20)
     cmd = models.CharField(max_length=200)
-    sd_name = models.CharField(max_length=20)
+    deployed_by = models.CharField(max_length=20)
     mtime = models.DateTimeField(auto_now = True)
 
     def __unicode__(self):
