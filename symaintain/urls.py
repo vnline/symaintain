@@ -16,7 +16,8 @@ urlpatterns = patterns('',
     url(r'^updatesch/(?P<itemid>[^/]+)/$',updatesch,name= 'updatesch'),
     url(r'^delete/(?P<itemid>[^/]+)/$',delete,name= 'delete'),
     url(r'^finish/(?P<itemid>[^/]+)/$',finish,name= 'finish'),
-    url(r'^hotupdate$',hotupdate,name= 'hotupdate$'),
+    url(r'^hotupdate$',hotupdate,name= 'hotupdate'),
+    url(r'^upload$',upload_file,name= 'upload'),
     # url(r'^symaintain/', include('symaintain.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:

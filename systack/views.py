@@ -1,6 +1,6 @@
 #!-*- coding=utf-8 -*-
 
-from django.shortcuts import render_to_response,Http404
+
 from django.template import RequestContext
 from django.http import HttpResponseRedirect,HttpResponse
 from django.core.urlresolvers import reverse
@@ -11,7 +11,10 @@ from django.contrib.messages import api as messages,constants as message
 from django.template.loader import get_template
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from symaintain import settings
 from form import *
+import os,uuid
 
 
 @login_required(login_url='account_login')
@@ -19,7 +22,10 @@ def index(request):
     '''首页'''
     if request.user.is_authenticated():
         user = request.user
-        return render_to_response('index.html',{'user':user},context_instance=RequestContext(request))
+        #return render_to_response('index.html',{'user':user},context_instance=RequestContext(request))
+        t = get_template('systack/index.html')
+        c = RequestContext(request,locals())
+        return HttpResponse(t.render(c))
     else:
         #user = request.user
         return HttpResponseRedirect(reverse('account_login'))
@@ -50,7 +56,10 @@ def login(request):
             validate_login(request, form.cleaned_data["username"], form.cleaned_data["password"])
             return HttpResponseRedirect(reverse('index'))
     template_var["form"] = form
-    return render_to_response('login.html', template_var, context_instance=RequestContext(request))
+    #return render_to_response('login.html', template_var, context_instance=RequestContext(request))
+    t = get_template('systack/login.html')
+    c = RequestContext(request,locals())
+    return HttpResponse(t.render(c))
 
 
 def logout(request):
@@ -78,7 +87,7 @@ def schedule(request):
             base.created_by = request.user
             base.mtime = timezone.now()
             base.save()
-    t = get_template('schedule.html')
+    t = get_template('systack/schedule.html')
     c = RequestContext(request,locals())
     return HttpResponse(t.render(c))
 
@@ -92,7 +101,7 @@ def updatesch(request,itemid):
             form.status = 'True'
         form.save()
         return HttpResponseRedirect(reverse('schedule'))
-    t = get_template('schedule_edit.html')
+    t = get_template('systack/schedule_edit.html')
     c = RequestContext(request,locals())
     return HttpResponse(t.render(c))
 
@@ -133,10 +142,36 @@ def hotupdate(request):
             base.created_by = unicode(request.user)
             base.mtime = timezone.now()
             base.save()
-    t = get_template('hotupdate.html')
+    t = get_template('systack/hotupdate.html')
     c = RequestContext(request,locals())
     return HttpResponse(t.render(c))
 
 
+@csrf_exempt
+@login_required(login_url='account_login')
+def upload_file(request):
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            handle_uploaded_file(request.FILES['file'])
+            return HttpResponseRedirect(reverse('hotupdate'))
+    else:
+        form = UploadFileForm()
+    t = get_template('systack/upload.html')
+    c = RequestContext(request,locals())
+    return HttpResponse(t.render(c))
+
+def handle_uploaded_file(file):
+    '''上传函数'''
+    print file
+    if file:
+        #path=os.path.join(settings.MEDIA_ROOT,'upload')
+        path='D:\upload'
+        #ext_name = file.split('.')[1]
+        file_name=str(uuid.uuid1())+".beam"
+        path_file=os.path.join(path,file_name)
+        with open(path_file,'wb+') as parser:
+            for chunk in file.chunks():
+                parser.write(chunk)
 
 

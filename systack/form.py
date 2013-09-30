@@ -41,3 +41,7 @@ class HotupdateForm(ModelForm):
     class Meta:
         model = Hot_update
         exclude = ('hot_status','deployed_by','mtime')
+
+class UploadFileForm(forms.Form):
+    title = forms.CharField(max_length=50)
+    file  = forms.FileField()

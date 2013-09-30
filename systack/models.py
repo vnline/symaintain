@@ -23,7 +23,6 @@ class Schedule(models.Model):
 
 class Hot_update(models.Model):
     target = models.CharField(max_length=20)
-    files = models.FileField(upload_to ='hotupdate/%Y/%m/',blank = True)
     result = models.BooleanField()
     deployed_by = models.CharField(max_length=20)
     mtime = models.DateTimeField(auto_now = True)
@@ -31,12 +30,15 @@ class Hot_update(models.Model):
     def __unicode__(self):
         return self.files
 
-    @property
-    def filename(self):
-        return os.path.basename(self.file.name)
-
     class Meta:
         db_table = "hot_update"
+
+class Files(models.Model):
+    hot_update = models.ForeignKey(Hot_update)
+    file = models.FileField(upload_to='server')
+
+    class Meta:
+        db_table = "Files"
 
 class Deploy(models.Model):
     target = models.CharField(max_length=20)

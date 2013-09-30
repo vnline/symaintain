@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 
 <!-- Mirrored from responsivewebinc.com/premium/macadmin/ by HTTrack Website Copier/3.x [XR&CO'2013], Thu, 08 Aug 2013 06:53:43 GMT -->
 <head>
@@ -33,6 +33,8 @@
   <link rel="stylesheet" href="{{STATIC_URL}}style/uniform.default.css">
   <!-- Bootstrap toggle -->
   <link rel="stylesheet" href="{{STATIC_URL}}style/bootstrap-toggle-buttons.css">
+  <!-- uploadify -->
+  <link rel="stylesheet" href="{{STATIC_URL}}style/uploadify.css">
   <!-- less -->
   <link rel="stylesheet/less" href="{{STATIC_URL}}less/datetimepicker.less">
   <!-- Main stylesheet -->
@@ -54,18 +56,18 @@
 <body>
 <div class="content">
 	{% block header %}
-	    {% include 'common/nav.html'%}
+	    {% include 'systack/common/nav.html' %}
 	{% endblock %}
 	{% block sidebar %}
-        {% include "common/sidebar.html" %}
+        {% include "systack/common/sidebar.html" %}
     {% endblock %}
     {% block mainbar %}
-        {% include "common/mainbar.html" %}
+        {% include "systack/common/mainbar.html" %}
     {% endblock %}
     {% block content %}
     {% endblock %}
 </div>
-{% include "common/footer.html" %}
+{% include "systack/common/footer.html" %}
 {% block js %}
 
 {% endblock %}
@@ -100,6 +102,8 @@
 <script src="{{STATIC_URL}}js/filter.js"></script> <!-- Filter for support page -->
 <script src="{{STATIC_URL}}js/custom.js"></script> <!-- Custom codes -->
 <script src="{{STATIC_URL}}js/charts.js"></script> <!-- Custom codes -->
+<script src="{{STATIC_URL}}js/jquery.uploadify.js"></script>
+<script src="{{STATIC_URL}}js/jquery.uploadify.min.js"></script>
 <script type="text/javascript">
    $(".form_datetime").datetimepicker({
       format: "yyyy-mm-dd hh:ii",
