@@ -69,6 +69,14 @@ def logout(request):
 
 @login_required(login_url='account_login')
 def schedule(request):
+    if request.method == 'POST':
+        schedule = Schedule()
+        form = ScheduleForm(request.POST,instance=schedule)
+        if form.is_valid():
+            base = form.save(commit=False)
+            base.created_by = request.user
+            base.mtime = timezone.now()
+            base.save()
     schedules = Schedule.objects.all().order_by('-id')
     paginator = Paginator(schedules ,10)
     try:
@@ -79,14 +87,6 @@ def schedule(request):
         schedules = paginator.page(page)
     except :
         schedules = paginator.page(paginator.num_pages)
-    if request.method == 'POST':
-        schedule = Schedule()
-        form = ScheduleForm(request.POST,instance=schedule)
-        if form.is_valid():
-            base = form.save(commit=False)
-            base.created_by = request.user
-            base.mtime = timezone.now()
-            base.save()
     t = get_template('systack/schedule.html')
     c = RequestContext(request,locals())
     return HttpResponse(t.render(c))
@@ -166,7 +166,6 @@ def upload_file(request):
 def handle_uploaded_file(file):
     '''上传函数'''
     if file:
-        print "handle_upload!!"
         path = os.path.join(settings.MEDIA_ROOT,'upload')
         if not os.path.exists(path):
             os.mkdir(path)
@@ -182,6 +181,6 @@ def handle_uploaded_file(file):
             return False
         return True
     else:
-        print "not found file!!"
+        pass
 
 
