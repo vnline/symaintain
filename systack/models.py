@@ -1,4 +1,4 @@
-from django.utils import timezone
+#from django.utils import timezone
 from django.db import models
 import os
 
@@ -21,24 +21,20 @@ class Schedule(models.Model):
     class Meta:
         db_table = "schedule"
 
+
 class Hot_update(models.Model):
     target = models.CharField(max_length=20)
     result = models.BooleanField()
+    files = models.TextField(max_length=200)
     deployed_by = models.CharField(max_length=20)
     mtime = models.DateTimeField(auto_now = True)
-
-    def __unicode__(self):
-        return self.files
 
     class Meta:
         db_table = "hot_update"
 
-class Files(models.Model):
-    hot_update = models.ForeignKey(Hot_update)
-    file = models.FileField(upload_to='server')
+    def __unicode__(self):
+        return self.files
 
-    class Meta:
-        db_table = "Files"
 
 class Deploy(models.Model):
     target = models.CharField(max_length=20)

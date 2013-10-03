@@ -32,16 +32,18 @@ class RegisterForm(forms.Form):
         raise forms.ValidationError((u"改邮箱已经被使用"))
 
 class ScheduleForm(ModelForm):
+
     class Meta:
         model = Schedule
         exclude = ('deployed_by','mtime')
 
 
-class HotupdateForm(ModelForm):
+class Hot_updateForm(ModelForm):
+
     class Meta:
         model = Hot_update
-        exclude = ('hot_status','deployed_by','mtime')
+    exclude = ('result','deployed_by','mtime')
 
 class UploadFileForm(forms.Form):
     title = forms.CharField(max_length=50)
-    file  = forms.FileField()
+    files  = forms.FileField()

@@ -33,16 +33,17 @@
   <link rel="stylesheet" href="{{STATIC_URL}}style/uniform.default.css">
   <!-- Bootstrap toggle -->
   <link rel="stylesheet" href="{{STATIC_URL}}style/bootstrap-toggle-buttons.css">
-  <!-- uploadify -->
-  <link rel="stylesheet" href="{{STATIC_URL}}style/uploadify.css">
   <!-- less -->
   <link rel="stylesheet/less" href="{{STATIC_URL}}less/datetimepicker.less">
+  <!-- uploadify css -->
+  <link rel="stylesheet" href="{{ STATIC_URL }}style/uploadify.css">
   <!-- Main stylesheet -->
   <link href="{{STATIC_URL}}style/style.css" rel="stylesheet">
   <!-- Widgets stylesheet -->
   <link href="{{STATIC_URL}}style/widgets.css" rel="stylesheet">
   <!-- Responsive style (from Bootstrap) -->
   <link href="{{STATIC_URL}}style/bootstrap-responsive.css" rel="stylesheet">
+
    {% block extracss %}{% endblock %}
   <!-- HTML5 Support for IE -->
   <!--[if lt IE 9]>
@@ -78,14 +79,12 @@
 <script src="{{STATIC_URL}}js/fullcalendar.min.js"></script> <!-- Full Google Calendar - Calendar -->
 <script src="{{STATIC_URL}}js/jquery.rateit.min.js"></script> <!-- RateIt - Star rating -->
 <script src="{{STATIC_URL}}js/jquery.prettyPhoto.js"></script> <!-- prettyPhoto -->
-
 <!-- jQuery Flot -->
 <script src="{{STATIC_URL}}js/excanvas.min.js"></script>
 <script src="{{STATIC_URL}}js/jquery.flot.js"></script>
 <script src="{{STATIC_URL}}js/jquery.flot.resize.js"></script>
 <script src="{{STATIC_URL}}js/jquery.flot.pie.js"></script>
 <script src="{{STATIC_URL}}js/jquery.flot.stack.js"></script>
-
 <!-- jQuery Notification - Noty -->
 <script src="{{STATIC_URL}}js/jquery.noty.js"></script> <!-- jQuery Notify -->
 <script src="{{STATIC_URL}}js/themes/default.js"></script> <!-- jQuery Notify -->
@@ -93,7 +92,6 @@
 <!-- <script src="{{STATIC_URL}}js/layouts/topRight.js"></script> <!-- jQuery Notify -->
 <script src="{{STATIC_URL}}js/layouts/top.js"></script> <!-- jQuery Notify -->
 <!-- jQuery Notification ends -->
-
 <script src="{{STATIC_URL}}js/sparklines.js"></script> <!-- Sparklines -->
 <script src="{{STATIC_URL}}js/jquery.cleditor.min.js"></script> <!-- CLEditor -->
 <script src="{{STATIC_URL}}js/bootstrap-datetimepicker.min.js"></script> <!-- Date picker -->
@@ -112,6 +110,25 @@
       startDate: "2013-09-24 10:00",
       minuteStep: 10
       });
+</script>
+<script type="text/javascript">
+    $(function() {
+        $('#file_upload').uploadify({
+            'swf'      : '{{STATIC_URL}}swf/uploadify.swf',
+            'cancelImg' : '{{STATIC_URL}}img/icons/uploadify-cancel.png',
+            'multi' : true,
+            'auto' : false,
+            'queueSizeLimit':20,
+            'uploader' : '{% url 'systack.views.upload_file' %}',
+            'removeCompleted':false,//
+            'sizeLimit':20480000,//设置上传文件大小单位kb
+            'fileExt':'*.config;*.beam;*.png;*.jpg',//设置上传文件类型为常用图片格式
+            'fileDesc':'Image Files;Config Files'
+        });
+    });
+    function uploadstart(){
+        $('#file_upload').uploadify('upload');												//开始上传
+    }
 </script>
 </body>
 </html>

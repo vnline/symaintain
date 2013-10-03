@@ -1,6 +1,5 @@
 #!-*- coding=utf-8 -*-
 
-
 from django.template import RequestContext
 from django.http import HttpResponseRedirect,HttpResponse
 from django.core.urlresolvers import reverse
@@ -14,6 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from symaintain import settings
 from form import *
+from models import *
 import os,uuid
 
 
@@ -134,14 +134,19 @@ def hotupdate(request):
         hots = paginator.page(page)
     except :
         hots = paginator.page(paginator.num_pages)
+    #handle_uploaded_file(request.FILES['file'])
     if request.method == 'POST':
-        hots = Hot_update()
-        form = HotupdateForm(request.POST,instance=hots)
+        #hots = Hot_update()
+        form = Hot_updateForm(request.POST,instance=hots)
+        #print "something wrong here!!"
         if form.is_valid():
-            base = form.save(commit=False)
-            base.created_by = unicode(request.user)
-            base.mtime = timezone.now()
-            base.save()
+            #print "wrong there!!"
+            if handle_uploaded_file(request.FILES['file']):
+                base = form.save(commit=False)
+                base.files = request.FILES['file'].name
+                base.created_by = unicode(request.user)
+                base.mtime = timezone.now()
+                base.save()
     t = get_template('systack/hotupdate.html')
     c = RequestContext(request,locals())
     return HttpResponse(t.render(c))
@@ -151,27 +156,32 @@ def hotupdate(request):
 @login_required(login_url='account_login')
 def upload_file(request):
     if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            handle_uploaded_file(request.FILES['file'])
-            return HttpResponseRedirect(reverse('hotupdate'))
+        if handle_uploaded_file(request.FILES['Filedata']):
+            return HttpResponse('succees!!')
+        else:
+            return HttpResponse(404)
     else:
-        form = UploadFileForm()
-    t = get_template('systack/upload.html')
-    c = RequestContext(request,locals())
-    return HttpResponse(t.render(c))
+        return HttpResponse(403)
 
 def handle_uploaded_file(file):
     '''上传函数'''
-    print file
     if file:
-        #path=os.path.join(settings.MEDIA_ROOT,'upload')
-        path='D:\upload'
-        #ext_name = file.split('.')[1]
-        file_name=str(uuid.uuid1())+".beam"
+        print "handle_upload!!"
+        path = os.path.join(settings.MEDIA_ROOT,'upload')
+        if not os.path.exists(path):
+            os.mkdir(path)
+        #ext_name = file.name.split('.')[1]
+        #file_name = str(uuid.uuid1())+"."+ext_name
+        file_name = file.name
         path_file=os.path.join(path,file_name)
-        with open(path_file,'wb+') as parser:
-            for chunk in file.chunks():
-                parser.write(chunk)
+        try:
+            with open(path_file,'wb+') as parser:
+                for chunk in file.chunks():
+                    parser.write(chunk)
+        except:
+            return False
+        return True
+    else:
+        print "not found file!!"
 
 
