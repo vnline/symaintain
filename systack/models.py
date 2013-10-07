@@ -26,7 +26,7 @@ class Hot_update(models.Model):
     target = models.CharField(max_length=20)
     result = models.BooleanField()
     files = models.TextField(max_length=200)
-    deployed_by = models.CharField(max_length=20)
+    deployed_by = models.CharField(max_length=20,blank = True)
     mtime = models.DateTimeField(auto_now = True)
 
     class Meta:
@@ -42,11 +42,16 @@ class Deploy(models.Model):
     deploy_name = models.CharField(max_length=20)
     prev_name = models.CharField(max_length=20)
     importdb = models.BooleanField()
-    add_pay = models.BooleanField()
     cgm = models.BooleanField()
+    deployed_by = models.CharField(max_length=20)
+    result = models.BooleanField()
+    mtime = models.DateTimeField(auto_now = True)
 
     class Meta:
         db_table = "deploy"
+
+    def __unicode__(self):
+        return self.deploy_name
 
 class Operation(models.Model):
     target = models.CharField(max_length=20)

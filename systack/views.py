@@ -12,9 +12,10 @@ from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from symaintain import settings
+#from mc_salt.master.lib import client
 from form import *
 from models import *
-import os,uuid
+import os
 
 
 @login_required(login_url='account_login')
@@ -107,20 +108,50 @@ def updatesch(request,itemid):
 
 @login_required(login_url='account_login')
 def delete(request,itemid):
-    schedules = Schedule.objects.get(id=itemid)
-    schedules.delete()
-    return HttpResponseRedirect(reverse('schedule'))
+    if request.GET.get('itemid',''):
+        schedules = Schedule.objects.get(id=itemid)
+        schedules.delete()
+        return HttpResponseRedirect(reverse('schedule'))
+    else:
+        return HttpResponseRedirect(reverse('error'))
 
 @login_required(login_url='account_login')
 def finish(request,itemid):
-    schedule_instance = Schedule.objects.get(id=itemid)
-    schedule_instance.deployed_by = unicode(request.user)
-    schedule_instance.deploy = True
-    if schedule_instance.open_time < timezone.now():
-        schedule_instance.status = 'True'
-    schedule_instance.save()
-    return HttpResponseRedirect(reverse('schedule'))
+    if request.GET.get('itemid',''):
+        schedule_instance = Schedule.objects.get(id=itemid)
+        schedule_instance.deployed_by = unicode(request.user)
+        schedule_instance.deploy = True
+        if schedule_instance.open_time < timezone.now():
+            schedule_instance.status = 'True'
+        schedule_instance.save()
+        return HttpResponseRedirect(reverse('schedule'))
+    else:
+        return HttpResponseRedirect(reverse('error'))
 
+@login_required(login_url='account_login')
+def deploy(request):
+    if request.method == 'POST':
+        deploy = Deploy()
+        form = DeployForm(request.POST,instance=deploy)
+        if form.is_valid():
+            base = form.save(commit=False)
+            print base.importdb,base.cgm
+            base.deployed_by = request.user
+            base.mtime = timezone.now()
+            base.save()
+    deploys = Deploy.objects.all().order_by('-id')
+    paginator = Paginator(deploys ,10)
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+    try:
+        deploys = paginator.page(page)
+    except :
+        deploys = paginator.page(paginator.num_pages)
+    t = get_template('systack/deploy.html')
+    c = RequestContext(request,locals())
+    return HttpResponse(t.render(c))
 
 @login_required(login_url='account_login')
 def hotupdate(request):
@@ -134,19 +165,17 @@ def hotupdate(request):
         hots = paginator.page(page)
     except :
         hots = paginator.page(paginator.num_pages)
-    #handle_uploaded_file(request.FILES['file'])
     if request.method == 'POST':
-        #hots = Hot_update()
+        hots = Hot_update()
         form = Hot_updateForm(request.POST,instance=hots)
-        #print "something wrong here!!"
+        val = request.POST['files'].split(' ')
+
         if form.is_valid():
-            #print "wrong there!!"
-            if handle_uploaded_file(request.FILES['file']):
-                base = form.save(commit=False)
-                base.files = request.FILES['file'].name
-                base.created_by = unicode(request.user)
-                base.mtime = timezone.now()
-                base.save()
+            base = form.save(commit=False)
+            base.files = request.POST['files']
+            base.created_by = unicode(request.user)
+            base.mtime = timezone.now()
+            base.save()
     t = get_template('systack/hotupdate.html')
     c = RequestContext(request,locals())
     return HttpResponse(t.render(c))
