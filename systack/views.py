@@ -1,7 +1,9 @@
 #!-*- coding=utf-8 -*-
 
+import os
+from models import *
+from form import *
 from django.template import RequestContext
-from django.http import HttpResponseRedirect,HttpResponse
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.utils import timezone
@@ -12,10 +14,8 @@ from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from symaintain import settings
-#from mc_salt.master.lib import client
-from form import *
-from models import *
-import os
+from mc_salt.master.lib import client
+from django.http import HttpResponseRedirect,HttpResponse,HttpResponseServerError,HttpResponseNotAllowed,HttpResponseNotFound
 
 
 @login_required(login_url='account_login')
@@ -108,16 +108,16 @@ def updatesch(request,itemid):
 
 @login_required(login_url='account_login')
 def delete(request,itemid):
-    if request.GET.get('itemid',''):
+    try:
         schedules = Schedule.objects.get(id=itemid)
         schedules.delete()
         return HttpResponseRedirect(reverse('schedule'))
-    else:
+    except Schedule.DoesNotExist:
         return HttpResponseRedirect(reverse('error'))
 
 @login_required(login_url='account_login')
 def finish(request,itemid):
-    if request.GET.get('itemid',''):
+    try:
         schedule_instance = Schedule.objects.get(id=itemid)
         schedule_instance.deployed_by = unicode(request.user)
         schedule_instance.deploy = True
@@ -125,8 +125,14 @@ def finish(request,itemid):
             schedule_instance.status = 'True'
         schedule_instance.save()
         return HttpResponseRedirect(reverse('schedule'))
-    else:
+    except Schedule.DoesNotExist:
         return HttpResponseRedirect(reverse('error'))
+
+@login_required(login_url='account_login')
+def error(request):
+    t = get_template('systack/error.html')
+    c = RequestContext(request,locals())
+    return HttpResponse(t.render(c))
 
 @login_required(login_url='account_login')
 def deploy(request):
@@ -135,7 +141,6 @@ def deploy(request):
         form = DeployForm(request.POST,instance=deploy)
         if form.is_valid():
             base = form.save(commit=False)
-            print base.importdb,base.cgm
             base.deployed_by = request.user
             base.mtime = timezone.now()
             base.save()
@@ -155,8 +160,21 @@ def deploy(request):
 
 @login_required(login_url='account_login')
 def hotupdate(request):
+    if request.method == 'POST':
+        hots = Hot_update()
+        form = Hot_updateForm(request.POST,instance=hots)
+        if form.is_valid():
+            hotfile = form.save(commit=False)
+            target = request.POST.get('target')
+            files = request.POST['files'].split(' ')
+            hotfile.files = hots.get_file_name(files)
+            result_dict =  hots.file_update(target,files)
+            hotfile.result = result_dict
+            hotfile.deployed_by = unicode(request.user)
+            hotfile.mtime = timezone.now()
+            hotfile.save()
     hots = Hot_update.objects.all().order_by('-id')
-    paginator = Paginator(hots ,10)
+    paginator = Paginator(hots ,5)
     try:
         page = int(request.GET.get('page', '1'))
     except ValueError:
@@ -165,17 +183,6 @@ def hotupdate(request):
         hots = paginator.page(page)
     except :
         hots = paginator.page(paginator.num_pages)
-    if request.method == 'POST':
-        hots = Hot_update()
-        form = Hot_updateForm(request.POST,instance=hots)
-        val = request.POST['files'].split(' ')
-
-        if form.is_valid():
-            base = form.save(commit=False)
-            base.files = request.POST['files']
-            base.created_by = unicode(request.user)
-            base.mtime = timezone.now()
-            base.save()
     t = get_template('systack/hotupdate.html')
     c = RequestContext(request,locals())
     return HttpResponse(t.render(c))
@@ -188,28 +195,101 @@ def upload_file(request):
         if handle_uploaded_file(request.FILES['Filedata']):
             return HttpResponse('succees!!')
         else:
-            return HttpResponse(404)
+            return HttpResponseNotFound()
     else:
-        return HttpResponse(403)
+        return HttpResponseNotAllowed('GET')
 
 def handle_uploaded_file(file):
-    '''上传函数'''
+    """
+    文件上传处理函数
+    """
     if file:
         path = os.path.join(settings.MEDIA_ROOT,'upload')
         if not os.path.exists(path):
-            os.mkdir(path)
-        #ext_name = file.name.split('.')[1]
-        #file_name = str(uuid.uuid1())+"."+ext_name
+            try:
+                os.mkdir(path)
+            except:
+                return False
         file_name = file.name
-        path_file=os.path.join(path,file_name)
+        file_path = os.path.join(path,file_name)
         try:
-            with open(path_file,'wb+') as parser:
+            with open(file_path,'wb+') as parser:
                 for chunk in file.chunks():
                     parser.write(chunk)
         except:
             return False
         return True
     else:
-        pass
+        return HttpResponseServerError()
+
+def copy_update(target,files):
+    """
+    文件热更函数
+    """
+    send_ret = {}
+    hot_ret = {}
+    result_dict = {}
+    cli = client.Client("%s" % target ,role="node",timeout=120)
+    for file in files:
+        file = file.encode('utf-8')
+        file_name = os.path.basename(file)
+        mod,file_ext = os.path.splitext(file_name)
+        file_path = '/data/web/systack/media/upload'+ file_name
+        if not os.path.exists(file_path):
+            return False
+        send_ret[file_name] = cli.node_sys.node_copy(file_path,file)
+        if file_ext == ".beam":
+            hot_ret[file_name]  = cli.gstools.node_hot('hot_update',mod)
+        else:
+            pass
+    for k,v in send_ret.iteritems():
+        result_dict.setdefault(k,[ ]).append(v)
+    for k,v in hot_ret.items():
+        result_dict.setdefault(k,[ ]).append(v)
+    print "I'm HERE!!!"
+    return result_dict
+
+@login_required(login_url='account_login')
+def get_log(request):
+    try:
+        if request.GET.has_key('conf_jids'):
+            lst_update_jid = request.GET['conf_jids'].split(',')
+        else:
+            lst_update_jid = request.GET['jid'].split(',')
+        queue_id = request.GET['queue_id']
+        rds = RdsTool(queue_id)
+        q_result = rds.rds_read_all()
+        int_suc = 0
+        int_fail = 0
+        int_sum = len(q_result)
+        result_dict = {}
+        for q_id in q_result:
+            result_dict[q_id] = 0
+            for jid in lst_update_jid:
+                ret_dict = Deploy.get_job_result(jid,q_id)
+                if type(ret_dict['return']) == type({}):
+                    for _,v in ret_dict['return'].items():
+                        if v == False or v == 0:
+                            break
+                        else:
+                            result_dict[q_id] += 1
+                elif type(ret_dict['return']) == type(0):
+                    if ret_dict['return'] == True or ret_dict['return'] == 1:
+                        result_dict[q_id] += 1
+                    else:
+                        break
+        for k,v in result_dict.items():
+            if v < len(lst_update_jid):
+                int_fail += 1
+                result_dict[k] = 0
+            elif v == 0:
+                result_dict[k] = -1
+            else:
+                result_dict[k] = 1
+                int_suc += 1
+    except:
+        return HttpResponseNotFound()
+
+
 
 
