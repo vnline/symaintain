@@ -130,5 +130,23 @@
         $('#file_upload').uploadify('upload');												//开始上传
     }
 </script>
+<script type="text/javascript">
+    $(function() {
+        //twitter bootstrap script
+        $("button#submit").click(function(){
+            $.ajax({
+                type: "POST",
+                url: "{% url 'hotupdate' %}",
+                data: $('#hot').serialize(),
+                success: function(msg){
+                    alert("success!!")
+                }
+                error: function(){
+                    alert("failure");
+                }
+            });
+        });
+    });
+</script>
 </body>
 </html>

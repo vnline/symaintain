@@ -1,8 +1,10 @@
 #!-*- coding=utf-8 -*-
 
 import os
+import json
 from models import *
 from form import *
+from Common import *
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
@@ -14,8 +16,7 @@ from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from symaintain import settings
-from mc_salt.master.lib import client
-from django.http import HttpResponseRedirect,HttpResponse,HttpResponseServerError,HttpResponseNotAllowed,HttpResponseNotFound
+from django.http import HttpResponseRedirect,HttpResponse,HttpResponseServerError,HttpResponseNotAllowed,HttpResponseNotFound,Http404
 
 
 @login_required(login_url='account_login')
@@ -130,7 +131,7 @@ def finish(request,itemid):
 
 @login_required(login_url='account_login')
 def error(request):
-    t = get_template('systack/error.html')
+    t = get_template('systack/404.html')
     c = RequestContext(request,locals())
     return HttpResponse(t.render(c))
 
@@ -141,7 +142,7 @@ def deploy(request):
         form = DeployForm(request.POST,instance=deploy)
         if form.is_valid():
             base = form.save(commit=False)
-            base.deployed_by = request.user
+            base.deployed_by = unicode(request.user)
             base.mtime = timezone.now()
             base.save()
     deploys = Deploy.objects.all().order_by('-id')
@@ -159,34 +160,61 @@ def deploy(request):
     return HttpResponse(t.render(c))
 
 @login_required(login_url='account_login')
-def hotupdate(request):
+def deliver(request):
     if request.method == 'POST':
-        hots = Hot_update()
-        form = Hot_updateForm(request.POST,instance=hots)
+        deliver = Deliver()
+        form = DeliverForm(request.POST,instance=deliver)
         if form.is_valid():
-            hotfile = form.save(commit=False)
+            deliver = form.save(commit=False)
             target = request.POST.get('target')
-            files = request.POST['files'].split(' ')
-            hotfile.files = hots.get_file_name(files)
-            result_dict =  hots.file_update(target,files)
-            hotfile.result = result_dict
-            hotfile.deployed_by = unicode(request.user)
-            hotfile.mtime = timezone.now()
-            hotfile.save()
-    hots = Hot_update.objects.all().order_by('-id')
-    paginator = Paginator(hots ,5)
+            files = request.POST['files'].split('\r\n')
+            deliver.files = Common.get_file_name(files)
+            deliver.jids = Common.deliver(target,files)
+            deliver.deployed_by = unicode(request.user)
+            deliver.mtime = timezone.now()
+            deliver.save()
+    delivers = Deliver.objects.all().order_by('-id')
+    paginator = Paginator(delivers, 5)
     try:
         page = int(request.GET.get('page', '1'))
     except ValueError:
         page = 1
     try:
-        hots = paginator.page(page)
+        delivers = paginator.page(page)
     except :
-        hots = paginator.page(paginator.num_pages)
-    t = get_template('systack/hotupdate.html')
+        delivers = paginator.page(paginator.num_pages)
+    t = get_template('systack/deliver.html')
     c = RequestContext(request,locals())
     return HttpResponse(t.render(c))
 
+
+@login_required(login_url='account_login')
+def hotfile(request):
+    if request.method == 'POST' or request.is_ajax():
+        hotfile = Hotfile()
+        form = HotfileForm(request.POST,instance=hotfile)
+        if form.is_valid():
+            hot = form.save(commit=False)
+            target = request.POST.get('target')
+            files = request.POST['files'].split('\r\n')
+            hot.files = Common.get_file_name(files)
+            hot.jids = Common.hot_files(target,files)
+            hot.deployed_by = unicode(request.user)
+            hot.mtime = timezone.now()
+            hot.save()
+    hot = Hotfile.objects.all().order_by('-id')
+    paginator = Paginator(hot, 5)
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+    try:
+        hot = paginator.page(page)
+    except :
+        hot = paginator.page(paginator.num_pages)
+    t = get_template('systack/hotupdate.html')
+    c = RequestContext(request,locals())
+    return HttpResponse(t.render(c))
 
 @csrf_exempt
 @login_required(login_url='account_login')
@@ -222,32 +250,6 @@ def handle_uploaded_file(file):
     else:
         return HttpResponseServerError()
 
-def copy_update(target,files):
-    """
-    文件热更函数
-    """
-    send_ret = {}
-    hot_ret = {}
-    result_dict = {}
-    cli = client.Client("%s" % target ,role="node",timeout=120)
-    for file in files:
-        file = file.encode('utf-8')
-        file_name = os.path.basename(file)
-        mod,file_ext = os.path.splitext(file_name)
-        file_path = '/data/web/systack/media/upload'+ file_name
-        if not os.path.exists(file_path):
-            return False
-        send_ret[file_name] = cli.node_sys.node_copy(file_path,file)
-        if file_ext == ".beam":
-            hot_ret[file_name]  = cli.gstools.node_hot('hot_update',mod)
-        else:
-            pass
-    for k,v in send_ret.iteritems():
-        result_dict.setdefault(k,[ ]).append(v)
-    for k,v in hot_ret.items():
-        result_dict.setdefault(k,[ ]).append(v)
-    print "I'm HERE!!!"
-    return result_dict
 
 @login_required(login_url='account_login')
 def get_log(request):
@@ -256,39 +258,64 @@ def get_log(request):
             lst_update_jid = request.GET['conf_jids'].split(',')
         else:
             lst_update_jid = request.GET['jid'].split(',')
+        print(lst_update_jid)
         queue_id = request.GET['queue_id']
         rds = RdsTool(queue_id)
         q_result = rds.rds_read_all()
-        int_suc = 0
-        int_fail = 0
-        int_sum = len(q_result)
         result_dict = {}
+        tmp = {}
         for q_id in q_result:
-            result_dict[q_id] = 0
             for jid in lst_update_jid:
-                ret_dict = Deploy.get_job_result(jid,q_id)
-                if type(ret_dict['return']) == type({}):
-                    for _,v in ret_dict['return'].items():
-                        if v == False or v == 0:
-                            break
-                        else:
-                            result_dict[q_id] += 1
-                elif type(ret_dict['return']) == type(0):
-                    if ret_dict['return'] == True or ret_dict['return'] == 1:
-                        result_dict[q_id] += 1
-                    else:
-                        break
-        for k,v in result_dict.items():
-            if v < len(lst_update_jid):
-                int_fail += 1
-                result_dict[k] = 0
-            elif v == 0:
-                result_dict[k] = -1
-            else:
-                result_dict[k] = 1
-                int_suc += 1
+                ret_dict = Get_log.get_job_result(jid,q_id)
+                if ret_dict:
+                    if type(ret_dict['return']) == type({}):
+                        node_id = ret_dict['node_id']
+                        file_name = os.path.basename(ret_dict['return'].keys()[0])
+                        file_ret =  ret_dict['return'].values()[0]
+                        tmp.update({file_name:file_ret})
+                        result_dict.update({node_id:tmp})
+                    elif type(ret_dict['return']) == type(0):
+                        node_id = ret_dict['node_id']
+                        result_dict[node_id] = ret_dict['return']
+                else:
+                    pass
+        return HttpResponse(json.dumps(result_dict))
     except:
-        return HttpResponseNotFound()
+        raise Http404
+
+@csrf_exempt
+def ajax_test(request):
+    #if request.is_ajax():
+    #    if request.method == 'GET':
+    #        message = "This is an XHR GET request"
+    #    elif request.method == 'POST':
+    #        message = "This is an XHR POST request"
+    #        # Here we can access the POST data
+    #        print request.POST
+    #else:
+    #    message = "No XHR"
+    if request.method == "POST":
+        name = request.POST['name']
+        email = request.POST['Email']
+        sug = request.POST['sug']
+        return HttpResponse(name)
+    else:
+        jids = request.GET['jids']
+        print list(jids)
+        return HttpResponse(jids)
+
+def test(request):
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            handle_uploaded_file(request.FILES['files'])
+            #print request.FILES
+            HttpResponse('succees!!')
+    else:
+        form = UploadFileForm()
+    t = get_template('systack/upload.html')
+    c = RequestContext(request,locals())
+    return HttpResponse(t.render(c))
 
 
 

@@ -3,7 +3,7 @@
 from django import forms
 from django.forms import ModelForm
 from django.contrib.auth.models import User
-from systack.models import Schedule,Hot_update,Deploy,Operation
+from systack.models import Schedule,Hotfile,Deliver,Deploy,Operation
 
 class LoginForm(forms.Form):
 
@@ -38,16 +38,22 @@ class ScheduleForm(ModelForm):
         exclude = ('deployed_by','mtime')
 
 
-class Hot_updateForm(ModelForm):
+class DeliverForm(ModelForm):
 
     class Meta:
-        model = Hot_update
+        model = Deliver
     exclude = ('result','deployed_by','mtime')
 
 class DeployForm(ModelForm):
 
     class Meta:
         model = Deploy
+    exclude = ('deployed_by','result','mtime')
+
+class HotfileForm(ModelForm):
+
+    class Meta:
+        model = Hotfile
     exclude = ('deployed_by','result','mtime')
 
 class UploadFileForm(forms.Form):

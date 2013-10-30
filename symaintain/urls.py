@@ -18,8 +18,12 @@ urlpatterns = patterns('',
     url(r'^updatesch/(?P<itemid>[^/]+)/$',updatesch, name='updatesch'),
     url(r'^delete/(?P<itemid>[^/]+)/$',delete, name='delete'),
     url(r'^finish/(?P<itemid>[^/]+)/$',finish, name='finish'),
-    url(r'^hotupdate$',hotupdate, name='hotupdate'),
+    url(r'^hotupdate$',hotfile, name='hotupdate'),
+    url(r'^deliver$',deliver, name='deliver'),
     url(r'^upload$',upload_file, name='upload_file'),
+    url(r'^ajax$',ajax_test, name='ajax_test'),
+    url(r'^get_log$',get_log, name='get_log'),
+    url(r'^test$',test, name='test'),
     # url(r'^symaintain/', include('symaintain.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
