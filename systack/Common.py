@@ -104,5 +104,3 @@ class Get_log(object):
         rds = RdsTool()
         str_ret = rds.read("%s.%s" %(jid,id))
         return str_ret
-
-

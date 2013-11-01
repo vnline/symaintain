@@ -5,6 +5,7 @@ import json
 from models import *
 from form import *
 from Common import *
+from django.core import serializers
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
@@ -258,12 +259,15 @@ def get_log(request):
             lst_update_jid = request.GET['conf_jids'].split(',')
         else:
             lst_update_jid = request.GET['jid'].split(',')
-        print(lst_update_jid)
         queue_id = request.GET['queue_id']
         rds = RdsTool(queue_id)
         q_result = rds.rds_read_all()
         result_dict = {}
-        tmp = {}
+        data = {
+            'node_id':[],
+            'file':[],
+            'result':[]
+        }
         for q_id in q_result:
             for jid in lst_update_jid:
                 ret_dict = Get_log.get_job_result(jid,q_id)
@@ -272,14 +276,24 @@ def get_log(request):
                         node_id = ret_dict['node_id']
                         file_name = os.path.basename(ret_dict['return'].keys()[0])
                         file_ret =  ret_dict['return'].values()[0]
-                        tmp.update({file_name:file_ret})
-                        result_dict.update({node_id:tmp})
+                        data['node_id'].append(node_id)
+                        data['file'].append(file_name)
+                        data['result'].append(file_ret)
+                        result_dict.update(data)
                     elif type(ret_dict['return']) == type(0):
                         node_id = ret_dict['node_id']
                         result_dict[node_id] = ret_dict['return']
                 else:
                     pass
-        return HttpResponse(json.dumps(result_dict))
+        msg = '<table class="table table-striped table-bordered table-hover">' \
+                "<thead>"\
+                    "<tr><th><b>区服：</b></th>" \
+                    "<th><b>文件：</b></th>" \
+                    "<th><b>结果：</b></th></tr>"\
+                "</thead>"
+        for node_id,file,result in zip(result_dict['node_id'],result_dict['file'],result_dict['result']):
+            msg += "<tr><td>%s</td><td>%s</td><td>%s</td></tr>" % (node_id,file,result)
+        return HttpResponse(msg)
     except:
         raise Http404
 

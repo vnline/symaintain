@@ -3,63 +3,63 @@
 
 <!-- Mirrored from responsivewebinc.com/premium/macadmin/ by HTTrack Website Copier/3.x [XR&CO'2013], Thu, 08 Aug 2013 06:53:43 GMT -->
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <meta charset="utf-8">
-  <!-- Title and other stuffs -->
-  <title>{% block title %}{% endblock %}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="shouyou">
-  <meta name="keywords" content="maintain">
-  <meta name="author" content="vnline">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <!-- Title and other stuffs -->
+    <title>{% block title %}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="shouyou">
+    <meta name="keywords" content="maintain">
+    <meta name="author" content="vnline">
 
-  <!-- Stylesheets -->
-  <link href="{{STATIC_URL}}style/bootstrap.css" rel="stylesheet">
-  <!-- Font awesome icon -->
-  <link rel="stylesheet" href="{{STATIC_URL}}style/font-awesome.css">
-  <!-- jQuery UI -->
-  <link rel="stylesheet" href="{{STATIC_URL}}style/jquery-ui.css">
-  <!-- Calendar -->
-  <link rel="stylesheet" href="{{STATIC_URL}}style/fullcalendar.css">
-  <!-- prettyPhoto -->
-  <link rel="stylesheet" href="{{STATIC_URL}}style/prettyPhoto.css">
-  <!-- Star rating -->
-  <link rel="stylesheet" href="{{STATIC_URL}}style/rateit.css">
-  <!-- Date picker -->
-  <link rel="stylesheet" href="{{STATIC_URL}}style/bootstrap-datetimepicker.min.css">
-  <link rel="stylesheet" href="{{STATIC_URL}}style/datetimepicker.css">
-  <!-- CLEditor -->
-  <link rel="stylesheet" href="{{STATIC_URL}}style/jquery.cleditor.css">
-  <!-- Uniform -->
-  <link rel="stylesheet" href="{{STATIC_URL}}style/uniform.default.css">
-  <!-- Bootstrap toggle -->
-  <link rel="stylesheet" href="{{STATIC_URL}}style/bootstrap-toggle-buttons.css">
-  <!-- less -->
-  <link rel="stylesheet/less" href="{{STATIC_URL}}less/datetimepicker.less">
-  <!-- uploadify css -->
-  <link rel="stylesheet" href="{{ STATIC_URL }}style/uploadify.css">
-  <!-- Main stylesheet -->
-  <link href="{{STATIC_URL}}style/style.css" rel="stylesheet">
-  <!-- Widgets stylesheet -->
-  <link href="{{STATIC_URL}}style/widgets.css" rel="stylesheet">
-  <!-- Responsive style (from Bootstrap) -->
-  <link href="{{STATIC_URL}}style/bootstrap-responsive.css" rel="stylesheet">
+    <!-- Stylesheets -->
+    <link href="{{STATIC_URL}}style/bootstrap.css" rel="stylesheet">
+    <!-- Font awesome icon -->
+    <link rel="stylesheet" href="{{STATIC_URL}}style/font-awesome.css">
+    <!-- jQuery UI -->
+    <link rel="stylesheet" href="{{STATIC_URL}}style/jquery-ui.css">
+    <!-- Calendar -->
+    <link rel="stylesheet" href="{{STATIC_URL}}style/fullcalendar.css">
+    <!-- prettyPhoto -->
+    <link rel="stylesheet" href="{{STATIC_URL}}style/prettyPhoto.css">
+    <!-- Star rating -->
+    <link rel="stylesheet" href="{{STATIC_URL}}style/rateit.css">
+    <!-- Date picker -->
+    <link rel="stylesheet" href="{{STATIC_URL}}style/bootstrap-datetimepicker.min.css">
+    <link rel="stylesheet" href="{{STATIC_URL}}style/datetimepicker.css">
+    <!-- CLEditor -->
+    <link rel="stylesheet" href="{{STATIC_URL}}style/jquery.cleditor.css">
+    <!-- Uniform -->
+    <link rel="stylesheet" href="{{STATIC_URL}}style/uniform.default.css">
+    <!-- Bootstrap toggle -->
+    <link rel="stylesheet" href="{{STATIC_URL}}style/bootstrap-toggle-buttons.css">
+    <!-- less -->
+    <link rel="stylesheet/less" href="{{STATIC_URL}}less/datetimepicker.less">
+    <!-- uploadify css -->
+    <link rel="stylesheet" href="{{ STATIC_URL }}style/uploadify.css">
+    <!-- Main stylesheet -->
+    <link href="{{STATIC_URL}}style/style.css" rel="stylesheet">
+    <!-- Widgets stylesheet -->
+    <link href="{{STATIC_URL}}style/widgets.css" rel="stylesheet">
+    <!-- Responsive style (from Bootstrap) -->
+    <link href="{{STATIC_URL}}style/bootstrap-responsive.css" rel="stylesheet">
 
-   {% block extracss %}{% endblock %}
-  <!-- HTML5 Support for IE -->
-  <!--[if lt IE 9]>
+    {% block extracss %}{% endblock %}
+    <!-- HTML5 Support for IE -->
+    <!--[if lt IE 9]>
   <script src="js/html5shim.js"></script>
   <![endif]-->
 
-  <!-- Favicon -->
-  <link rel="shortcut icon" href="{{STATIC_URL}}img/favicon/favicon.png">
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{{STATIC_URL}}img/favicon/favicon.png">
 
 </head>
 <body>
 <div class="content">
-	{% block header %}
-	    {% include 'systack/common/nav.html' %}
-	{% endblock %}
-	{% block sidebar %}
+    {% block header %}
+        {% include 'systack/common/nav.html' %}
+    {% endblock %}
+    {% block sidebar %}
         {% include "systack/common/sidebar.html" %}
     {% endblock %}
     {% block mainbar %}
@@ -103,13 +103,13 @@
 <script src="{{STATIC_URL}}js/jquery.uploadify.js"></script>
 <script src="{{STATIC_URL}}js/jquery.uploadify.min.js"></script>
 <script type="text/javascript">
-   $(".form_datetime").datetimepicker({
-      format: "yyyy-mm-dd hh:ii",
-      autoclose: true,
-      todayBtn: true,
-      startDate: "2013-09-24 10:00",
-      minuteStep: 10
-      });
+    $(".form_datetime").datetimepicker({
+        format: "yyyy-mm-dd hh:ii",
+        autoclose: true,
+        todayBtn: true,
+        startDate: "2013-09-24 10:00",
+        minuteStep: 10
+    });
 </script>
 <script type="text/javascript">
     $(function() {
@@ -129,24 +129,6 @@
     function uploadstart(){
         $('#file_upload').uploadify('upload');												//开始上传
     }
-</script>
-<script type="text/javascript">
-    $(function() {
-        //twitter bootstrap script
-        $("button#submit").click(function(){
-            $.ajax({
-                type: "POST",
-                url: "{% url 'hotupdate' %}",
-                data: $('#hot').serialize(),
-                success: function(msg){
-                    alert("success!!")
-                }
-                error: function(){
-                    alert("failure");
-                }
-            });
-        });
-    });
 </script>
 </body>
 </html>
