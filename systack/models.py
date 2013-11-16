@@ -62,7 +62,7 @@ class Deploy(models.Model):
     prev_name = models.CharField(max_length=20)
     importdb = models.BooleanField()
     cgm = models.BooleanField()
-    deployed_by = models.CharField(max_length=20)
+    deployed_by = models.CharField(max_length=20, blank=True)
     jids = models.TextField(max_length=200, blank=True)
     result = models.TextField(max_length=500, blank=True)
     mtime = models.DateTimeField(auto_now = True)

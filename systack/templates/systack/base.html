@@ -69,9 +69,6 @@
     {% endblock %}
 </div>
 {% include "systack/common/footer.html" %}
-{% block js %}
-
-{% endblock %}
 <!-- JS -->
 <script src="{{STATIC_URL}}js/jquery.js"></script> <!-- jQuery -->
 <script src="{{STATIC_URL}}js/bootstrap.js"></script> <!-- Bootstrap -->
@@ -104,10 +101,11 @@
 <script src="{{STATIC_URL}}js/jquery.uploadify.min.js"></script>
 <script type="text/javascript">
     $(".form_datetime").datetimepicker({
-        format: "yyyy-mm-dd hh:ii",
+        format: "yyyy-mm-dd hh:ii:ss",
         autoclose: true,
         todayBtn: true,
-        startDate: "2013-09-24 10:00",
+        pickSeconds: true,
+        startDate: "2013-09-24 10:00:00",
         minuteStep: 10
     });
 </script>
@@ -130,5 +128,8 @@
         $('#file_upload').uploadify('upload');												//开始上传
     }
 </script>
+{% block js %}
+
+{% endblock %}
 </body>
 </html>

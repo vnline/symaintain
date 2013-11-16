@@ -50,6 +50,43 @@ def get_file_name(files):
             file_name.append(name)
     return file_name
 
+def command(target,mod,arg,*args,**kwargs):
+    """
+    执行模块功能
+    """
+    jid = ""
+    target = target.encode('utf-8')
+    mod = mod.encode('utf-8')
+    arg = arg.encode('utf-8')
+    cli = client.Client("%s" % target, role="node",timeout=120)
+    if mod == "node_sys.ping":
+        jid = cli.node_sys.ping()
+    elif mod == "game_tools.hot_file":
+        jid = cli.game_tools.hot_file(arg)
+    elif mod == "change_client_version":
+        jid = cli.change_client_version(arg)
+    return jid
+
+def deploy(target,online_date, online_time, deploy_name, prev_name, importdb=None, add_pay=None,*args,**kwargs):
+    """
+    执行模块功能
+    """
+    jid = ""
+    #add_pay = add_pay.encode('utf-8')
+    if importdb == 'on':
+        importdb = True
+    else:
+        importdb = False
+    if add_pay == 'on':
+        add_pay = True
+    else:
+        add_pay = False
+    cli = client.Client("%s" % target, role="main",timeout=120)
+    print target,online_date,online_time,deploy_name,prev_name,importdb,add_pay
+    jid = cli.install_server.install(online_date,online_time,deploy_name,prev_name,importdb,add_pay)
+    print jid
+    return jid
+
 class RdsTool(object):
 
     def __init__(self,keys='salt.db.return'):

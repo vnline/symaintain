@@ -1,5 +1,22 @@
-{% extends "systack/base.html" %}
-{% if result_dict %}
-  {{ result_dict|safe }}
-   <p>testsTSETsetset</p>
-{% endif %}
+<table class="table table-striped table-bordered table-hover" >
+    <thead>
+    <tr>
+        <th>区服</th>
+        <th id="a">文件名</th>
+        <th>结果</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for key, value , result in list %}
+        <tr>
+            <td>{{ key }}</td>
+            <td id="b">{{ value }}</td>
+            {% if result %}
+            <td><span class="label label-success">成功</span></td>
+            {% else %}
+            <td><span class="label label-warning">失败</span></td>
+            {% endif %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

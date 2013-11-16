@@ -59,3 +59,8 @@ class HotfileForm(ModelForm):
 class UploadFileForm(forms.Form):
     title = forms.CharField(max_length=50)
     files  = forms.FileField()
+
+class OperationForm(ModelForm):
+    class Meta:
+        model = Operation
+    exclude = ('deployed_by','result','mtime')
