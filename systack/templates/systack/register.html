@@ -1,0 +1,65 @@
+{% extends "systack/base.html" %}
+{% block title %}SY_MainTain{% endblock %}
+{% block mainbar %}
+    <div class="admin-form">
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span12">
+                    <!-- Widget starts -->
+                    <div class="widget">
+                        <div class="widget-head">
+                            <i class="icon-lock"></i> 添加用户
+                        </div>
+                        <div class="widget-content">
+                            <div class="padd">
+
+                                <form class="form-horizontal">
+                                    <!-- Registration form starts -->
+                                    <!-- Username -->
+                                    <div class="control-group">
+                                        <label class="control-label" for="username">用户名：</label>
+                                        <div class="controls">
+                                            <input type="text" class="input-large" id="username">
+                                        </div>
+                                    </div>
+                                    <!-- Email -->
+                                    <div class="control-group">
+                                        <label class="control-label" for="email">电子邮箱：</label>
+                                        <div class="controls">
+                                            <input type="text" class="input-large" id="email">
+                                        </div>
+                                    </div>
+                                    <!-- Password -->
+                                    <div class="control-group">
+                                        <label class="control-label" for="email">密码：</label>
+                                        <div class="controls">
+                                            <input type="password" class="input-large" id="password">
+                                        </div>
+                                    </div>
+                                    <!-- Password -->
+                                    <div class="control-group">
+                                        <label class="control-label" for="email">重复密码：</label>
+                                        <div class="controls">
+                                            <input type="password" class="input-large" id="password">
+                                        </div>
+                                    </div>
+                                    <!-- Accept box and button s-->
+                                    <div class="control-group">
+                                        <div class="controls">
+                                            <button type="submit" class="btn">注册</button>
+                                            <button type="reset" class="btn">重置</button>
+                                        </div>
+                                    </div>
+                                </form>
+
+                            </div>
+                            <div class="widget-foot">
+                                <!-- Footer goes here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

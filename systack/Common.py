@@ -1,6 +1,7 @@
 #!-*- coding=utf-8 -*-
 import sys,os,re
 import redis
+import json
 import msgpack
 from mc_salt.master.lib import utils,client
 
@@ -103,11 +104,15 @@ class RdsTool(object):
 
     def read(self,jid):
         """
-        返回解码后的values
+        返回结果集
         """
         msg = self.redis.hget(self.keys,jid)
+        print self.keys,jid
         try:
-            msg = msgpack.loads(msg,use_list=True)
+            if self.keys == "salt.db.return":
+                msg = msgpack.loads(msg,use_list=True)
+            else:
+                msg = json.loads(msg)
         except:
             pass
         return msg
@@ -117,7 +122,7 @@ class RdsTool(object):
         """
         获取redis 指定数据库所有的区服ID
         """
-        idset = []
+        node_list = []
         regex = r'(\d{20})\.(\w\d_.+_\w\d+)'
         rdb_keys = self.redis.hkeys(self.keys)
         if rdb_keys:
@@ -125,19 +130,23 @@ class RdsTool(object):
                 m = re.match(regex,k)
                 try:
                     id = m.group(2)
-                    if id not in idset:
-                        idset.append(id)
+                    if id not in node_list:
+                        node_list.append(id)
                 except:
                     pass
-        return idset
+        return node_list
 
 class Get_log(object):
 
     @classmethod
-    def get_job_result(cls,jid,id):
+    def get_job_result(cls,jid,id,key=None):
         """
         从redis直接读取jid.id的结果
         """
-        rds = RdsTool()
-        str_ret = rds.read("%s.%s" %(jid,id))
+        if key:
+            rds = RdsTool(keys=key)
+            str_ret = rds.read("%s" % jid)
+        else:
+            rds = RdsTool()
+            str_ret = rds.read("%s.%s" %(jid,id))
         return str_ret

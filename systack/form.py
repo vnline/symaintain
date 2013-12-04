@@ -31,6 +31,26 @@ class RegisterForm(forms.Form):
             return self.cleaned_data["email"]
         raise forms.ValidationError((u"改邮箱已经被使用"))
 
+class userForm(ModelForm):
+
+    #username=forms.CharField(label=(u"登录账号"), widget=forms.TextInput(attrs={'placeholder':'登录账号','class':'input-block-level'}))
+    #email=forms.EmailField(label=(u"邮件地址"), widget=forms.TextInput(attrs={'placeholder':'登录邮箱','class':'input-block-level'}))
+    #password=forms.CharField(label=(u"登录密码"), widget=forms.PasswordInput(attrs={'placeholder':'登录密码','class':'input-block-level'}))
+    #repassword=forms.CharField(label=(u"重复登录密码"), widget=forms.PasswordInput(attrs={'placeholder':'重复登录密码','class':'input-block-level'}))
+    #BOOLEAN_CHOICES = ((u'True', True), (u'False', False))
+  # Filtering fields
+    #is_staff = forms.ChoiceField(label=(u'是否管理员'), choices = BOOLEAN_CHOICES, widget = forms.RadioSelect(attrs={'placeholder':'是否管理员'}))
+    #is_active = forms.ChoiceField(label=(u'是否激活'), choices = BOOLEAN_CHOICES, widget = forms.RadioSelect(attrs={'placeholder':'是否激活'}))
+
+    class Meta:
+        model = User
+
+    def clean_password(self):
+        data = self.cleaned_data
+        if "password" in data and "repassword" in data and data["password"] != data["repassword"]:
+            raise forms.ValidationError(u"两次输入的密码不一致！")
+
+
 class ScheduleForm(ModelForm):
 
     class Meta:
