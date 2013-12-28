@@ -43,7 +43,8 @@
     <link href="{{STATIC_URL}}style/widgets.css" rel="stylesheet">
     <!-- Responsive style (from Bootstrap) -->
     <link href="{{STATIC_URL}}style/bootstrap-responsive.css" rel="stylesheet">
-
+    <!-- Bootstrap-select -->
+    <link href="{{ STATIC_URL }}style/bootstrap-select.css" rel="stylesheet">
     {% block extracss %}{% endblock %}
     <!-- HTML5 Support for IE -->
     <!--[if lt IE 9]>
@@ -74,20 +75,22 @@
 <script src="{{STATIC_URL}}js/bootstrap.js"></script> <!-- Bootstrap -->
 <script src="{{STATIC_URL}}js/jquery-ui-1.9.2.custom.min.js"></script> <!-- jQuery UI -->
 <script src="{{STATIC_URL}}js/fullcalendar.min.js"></script> <!-- Full Google Calendar - Calendar -->
-<script src="{{STATIC_URL}}js/jquery.rateit.min.js"></script> <!-- RateIt - Star rating -->
-<script src="{{STATIC_URL}}js/jquery.prettyPhoto.js"></script> <!-- prettyPhoto -->
-<!-- jQuery Flot -->
-<script src="{{STATIC_URL}}js/excanvas.min.js"></script>
-<script src="{{STATIC_URL}}js/jquery.flot.js"></script>
-<script src="{{STATIC_URL}}js/jquery.flot.resize.js"></script>
-<script src="{{STATIC_URL}}js/jquery.flot.pie.js"></script>
-<script src="{{STATIC_URL}}js/jquery.flot.stack.js"></script>
+<script src="{{ STATIC_URL }}js/bootstrap-select.js"></script>
+
+{#<script src="{{STATIC_URL}}js/jquery.rateit.min.js"></script> <!-- RateIt - Star rating -->#}
+{#<script src="{{STATIC_URL}}js/jquery.prettyPhoto.js"></script> <!-- prettyPhoto -->#}
+{#<!-- jQuery Flot -->#}
+{#<script src="{{STATIC_URL}}js/excanvas.min.js"></script>#}
+{#<script src="{{STATIC_URL}}js/jquery.flot.js"></script>#}
+{#<script src="{{STATIC_URL}}js/jquery.flot.resize.js"></script>#}
+{#<script src="{{STATIC_URL}}js/jquery.flot.pie.js"></script>#}
+{#<script src="{{STATIC_URL}}js/jquery.flot.stack.js"></script>#}
 <!-- jQuery Notification - Noty -->
-<script src="{{STATIC_URL}}js/jquery.noty.js"></script> <!-- jQuery Notify -->
-<script src="{{STATIC_URL}}js/themes/default.js"></script> <!-- jQuery Notify -->
-<script src="{{STATIC_URL}}js/layouts/bottom.js"></script> <!-- jQuery Notify -->
-<!-- <script src="{{STATIC_URL}}js/layouts/topRight.js"></script> <!-- jQuery Notify -->
-<script src="{{STATIC_URL}}js/layouts/top.js"></script> <!-- jQuery Notify -->
+{#<script src="{{STATIC_URL}}js/jquery.noty.js"></script> <!-- jQuery Notify -->#}
+{#<script src="{{STATIC_URL}}js/themes/default.js"></script> <!-- jQuery Notify -->#}
+{#<script src="{{STATIC_URL}}js/layouts/bottom.js"></script> <!-- jQuery Notify -->#}
+{#<!-- <script src="{{STATIC_URL}}js/layouts/topRight.js"></script> <!-- jQuery Notify -->#}
+{#<script src="{{STATIC_URL}}js/layouts/top.js"></script> <!-- jQuery Notify -->#}
 <!-- jQuery Notification ends -->
 <script src="{{STATIC_URL}}js/sparklines.js"></script> <!-- Sparklines -->
 <script src="{{STATIC_URL}}js/jquery.cleditor.min.js"></script> <!-- CLEditor -->

@@ -1,10 +1,20 @@
 #!-*- coding=utf-8 -*-
-import sys,os,re
+import os
 import redis
-import json
 import msgpack
+from django.conf import settings
 from mc_salt.master.lib import utils,client
 
+def get_hosts():
+    """
+    获取所有主机列表
+    """
+    hosts = []
+    cli = client.Client("*" ,role="main",timeout=120)
+    ret = cli.get_host()
+    for host in ret.keys():
+        hosts.append(host)
+    return hosts
 
 
 def deliver(target,files):
@@ -16,7 +26,8 @@ def deliver(target,files):
         if file:
             file = file.encode('utf-8')
             file_name = os.path.basename(file)
-            file_path = '/data/web/maintain/systack/media/upload/'+ file_name
+            file_path = settings.MEDIA_ROOT +'/upload/'+ file_name
+            print file_path
             if not os.path.exists(file_path):
                 return 0
             cli = client.Client("%s" % target ,role="node",timeout=120)
@@ -51,24 +62,33 @@ def get_file_name(files):
             file_name.append(name)
     return file_name
 
-def command(target,mod,arg,*args,**kwargs):
+def command(as_role,target,cmd,arg,*args,**kwargs):
     """
     执行模块功能
     """
+
     jid = ""
+    as_role = as_role.encode('utf-8')
     target = target.encode('utf-8')
-    mod = mod.encode('utf-8')
+    cmd = cmd.encode('utf-8')
     arg = arg.encode('utf-8')
-    cli = client.Client("%s" % target, role="node",timeout=120)
-    if mod == "node_sys.ping":
-        jid = cli.node_sys.ping()
-    elif mod == "game_tools.hot_file":
-        jid = cli.game_tools.hot_file(arg)
-    elif mod == "change_client_version":
-        jid = cli.change_client_version(arg)
+    try:
+        cli = client.Client("%s" % target, role=as_role, timeout=120)
+        if as_role == "node":
+            if cmd == "ping":
+                jid = cli.node_sys.ping()
+            elif cmd == "hot_file":
+                jid = cli.game_tools.hot_file(arg)
+            elif cmd == "change_client_version":
+                jid = cli.game_tools.change_client_version(arg)
+        elif as_role == "main":
+            if cmd == "ping":
+                jid = cli.main_sys.ping()
+    except:
+        jid = None
     return jid
 
-def deploy(target,online_date, online_time, deploy_name, prev_name, importdb=None, add_pay=None,*args,**kwargs):
+def deploy(target,online_date, online_time, deploy_name, prev_name, importdb=None, cgm=None,*args,**kwargs):
     """
     执行模块功能
     """
@@ -78,75 +98,60 @@ def deploy(target,online_date, online_time, deploy_name, prev_name, importdb=Non
         importdb = True
     else:
         importdb = False
-    if add_pay == 'on':
-        add_pay = True
+    if cgm == 'on':
+        cgm = True
     else:
-        add_pay = False
+        cgm = False
     cli = client.Client("%s" % target, role="main",timeout=120)
-    print target,online_date,online_time,deploy_name,prev_name,importdb,add_pay
-    jid = cli.install_server.install(online_date,online_time,deploy_name,prev_name,importdb,add_pay)
-    print jid
+    print target,online_date,online_time,deploy_name,prev_name,importdb,cgm
+    jid = cli.install_server.install(online_date,online_time,deploy_name,prev_name,importdb,cgm)
     return jid
+
 
 class RdsTool(object):
 
-    def __init__(self,keys='salt.db.return'):
+    def __init__(self):
         """
         返回redis对象
         :param opts:
         :return:
         """
-        self.keys = keys
         self.opts = utils.read_config()
         self.pool = redis.ConnectionPool(db=self.opts['redis_db'],host=self.opts['redis_host'],port=int(self.opts['redis_port']),password=self.opts['password'])
         self.redis = redis.Redis(connection_pool=self.pool)
-
-
-    def read(self,jid):
-        """
-        返回结果集
-        """
-        msg = self.redis.hget(self.keys,jid)
-        print self.keys,jid
-        try:
-            if self.keys == "salt.db.return":
-                msg = msgpack.loads(msg,use_list=True)
-            else:
-                msg = json.loads(msg)
-        except:
-            pass
-        return msg
-
 
     def rds_read_all(self):
         """
         获取redis 指定数据库所有的区服ID
         """
         node_list = []
-        regex = r'(\d{20})\.(\w\d_.+_\w\d+)'
-        rdb_keys = self.redis.hkeys(self.keys)
-        if rdb_keys:
-            for k in rdb_keys:
-                m = re.match(regex,k)
-                try:
-                    id = m.group(2)
-                    if id not in node_list:
-                        node_list.append(id)
-                except:
-                    pass
+        try:
+            node_list = list(self.redis.smembers("salt.db.nodes"))
+        except:
+            pass
         return node_list
 
-class Get_log(object):
+class RdsLog(object):
 
-    @classmethod
-    def get_job_result(cls,jid,id,key=None):
+    def __init__(self,db):
+
+        self.opts = utils.read_config()
+        self.opts['redis_db'] = db
+        self.pool = redis.ConnectionPool(db=self.opts['redis_db'],host=self.opts['redis_host'],port=int(self.opts['redis_port']),password=self.opts['password'])
+        self.redis = redis.Redis(connection_pool=self.pool)
+
+    def all(self):
+        aret = self.redis.keys()
+        return aret
+
+    def get_job_result(self,jid,node_id):
         """
         从redis直接读取jid.id的结果
         """
-        if key:
-            rds = RdsTool(keys=key)
-            str_ret = rds.read("%s" % jid)
-        else:
-            rds = RdsTool()
-            str_ret = rds.read("%s.%s" %(jid,id))
-        return str_ret
+        ret = {}
+        try:
+            ret = msgpack.loads(self.redis.hget(jid,node_id))
+        except:
+            pass
+        return ret
+

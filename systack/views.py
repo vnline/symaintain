@@ -18,7 +18,6 @@ from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import permission_required
 from symaintain import settings
 from django.http import HttpResponseRedirect,HttpResponse,HttpResponseServerError,HttpResponseNotAllowed,HttpResponseNotFound,Http404
 
@@ -40,6 +39,8 @@ def index(request):
         hots_sum = hots.count()
         delivers = Deliver.objects.all()
         delivers_sum = delivers.count()
+        rds = RdsTool()
+        node_sum = len(rds.rds_read_all())
         t = get_template('systack/index.html')
         c = RequestContext(request,locals())
         return HttpResponse(t.render(c))
@@ -228,7 +229,7 @@ def finish(request,itemid):
 
 @login_required(login_url='account_login')
 def error(request):
-    t = get_template('systack/404.html')
+    t = get_template('404.html')
     c = RequestContext(request,locals())
     return HttpResponse(t.render(c))
 
@@ -249,7 +250,7 @@ def deploy(request):
             online_date,online_time = request.POST.get('open_time').split(' ')
             importdb = request.POST.get('importdb')
             cgm = request.POST.get('cgm')
-            base.jids = Common.deploy(target,online_date, online_time, deploy_name, prev_name, importdb=importdb, add_pay=cgm)
+            base.jids = Common.deploy(target,online_date, online_time, deploy_name, prev_name, importdb=importdb, cgm=cgm)
             base.save()
     deploys = Deploy.objects.all().order_by('-id')
     paginator = Paginator(deploys ,5)
@@ -302,10 +303,11 @@ def operation(request):
     t = get_template('systack/operation.html')
     c = RequestContext(request,locals())
     if request.method == 'POST':
-        target = request.POST.get('target')
-        mod = request.POST.get('mod')
-        arg = request.POST.get('arg')
-        jids = Common.command(target,mod,arg)
+        as_role = request.POST.get('as_role' or None)
+        target = request.POST.get('target' or None)
+        cmd = request.POST.get('cmd' or None)
+        arg = request.POST.get('arg' or None)
+        jids = Common.command(as_role,target,cmd,arg)
         return HttpResponse(jids)
     return HttpResponse(t.render(c))
 
@@ -351,7 +353,6 @@ def upload_file(request):
         return HttpResponseNotAllowed('GET')
 
 @csrf_exempt
-@login_required(login_url='account_login')
 def handle_uploaded_file(file):
     """
     文件上传处理函数
@@ -378,48 +379,66 @@ def handle_uploaded_file(file):
 @csrf_exempt
 @login_required(login_url='account_login')
 def get_log(request):
-    try:
-        if request.GET.has_key('conf_jids'):
-            lst_update_jid = request.GET['conf_jids'].split(',')
-        else:
-            lst_update_jid = request.GET['jid'].split(',')
-        queue_id = request.GET['queue_id']
-        rds = RdsTool(keys=queue_id)
+    role = request.GET['role']
+    lst_update_jid = request.GET['conf_jids'].split(',')
+    if role == "main":
+        q_result = Common.get_hosts()
+        print q_result
+    else:
+        rds = RdsTool()
         q_result = rds.rds_read_all()
-        result_dict = {}
-        data = {
-            'node_id':[],
-            'msg':[],
-            'result':[]
-        }
-        for q_id in q_result:
-            for jid in lst_update_jid:
-                ret_dict = Get_log.get_job_result(jid,q_id,key=None)
-                if ret_dict:
-                    if type(ret_dict['return']) == type({}):
-                        node_id = ret_dict['node_id']
+    rdl = RdsLog(db='1')
+    result_dict = {}
+    data = {
+        'role':[],
+        'main_id':[],
+        'node_id':[],
+        'msg':[],
+        'result':[]
+    }
+    for q_id in q_result:
+        for jid in lst_update_jid:
+            ret_dict = rdl.get_job_result(jid,q_id)
+            if ret_dict:
+                print ret_dict
+                if type(ret_dict['return']) == type({}):
+                    role = ret_dict['role']
+                    main_id = ret_dict['main_id']
+                    node_id = ret_dict['node_id']
+                    try:
                         file_name = os.path.basename(ret_dict['return'].keys()[0])
                         file_ret =  ret_dict['return'].values()[0]
-                        data['node_id'].append(node_id)
-                        data['msg'].append(file_name)
-                        data['result'].append(file_ret)
-                        result_dict.update(data)
-                    elif type(ret_dict['return']) == type(0):
-                        node_id = ret_dict['node_id']
-                        msg = ""
-                        result = str(ret_dict['return'])
-                        data['node_id'].append(node_id)
-                        data['msg'].append(msg)
-                        data['result'].append(result)
-                        result_dict.update(data)
+                    except:
+                        file_name = ""
+                        file_ret = ""
+                    data['role'].append(role)
+                    data['main_id'].append(main_id)
+                    data['node_id'].append(node_id)
+                    data['msg'].append(file_name)
+                    data['result'].append(file_ret)
+                    result_dict.update(data)
+                elif type(ret_dict['return']) == type(0) or ret_dict['return'] == "":
+                    role = ret_dict['role']
+                    main_id = ret_dict['main_id']
+                    node_id = ret_dict['node_id']
+                    msg = ""
+                    result = str(ret_dict['return'])
+                    data['role'].append(role)
+                    data['main_id'].append(main_id)
+                    data['node_id'].append(node_id)
+                    data['msg'].append(msg)
+                    data['result'].append(result)
+                    result_dict.update(data)
                 else:
-                    pass
-        list = zip(result_dict['node_id'],result_dict['msg'],result_dict['result'])
-        t = get_template('systack/modal.html')
-        c = RequestContext(request,locals())
-        return HttpResponse(t.render(c))
-    except:
-        raise Http404
+                    continue
+    try:
+        print result_dict
+        list = zip(result_dict['role'],result_dict['main_id'],result_dict['node_id'],result_dict['msg'],result_dict['result'])
+    except Exception:
+        list = [('None','None','None',False)]
+    t = get_template('systack/modal.html')
+    c = RequestContext(request,locals())
+    return HttpResponse(t.render(c))
 
 @csrf_exempt
 @login_required(login_url='account_login')
@@ -429,70 +448,13 @@ def game_log(request):
         if request.GET.has_key('deploy'):
             jid = request.GET.get('deploy')
             id = ""
-            ret = Get_log.get_job_result(jid,id,key='install_game')
+            ret = Get_log.get_job_result(jid,id,key='init_game')
             ret_list = ret.split('#')
     except:
         pass
     t = get_template('systack/modal.html')
     c = RequestContext(request,locals())
     return HttpResponse(t.render(c))
-
-@csrf_exempt
-def ajax_test(request):
-
-    #if request.method == "POST":
-    #    name = request.POST['name']
-    #    email = request.POST['Email']
-    #    sug = request.POST['sug']
-    #    return HttpResponse(name)
-    #else:
-    #    jids = request.GET['jids']
-    #    print list(jids)
-    #    return HttpResponse(jids)
-    try:
-        if request.GET.has_key('conf_jids'):
-            lst_update_jid = request.GET['conf_jids'].split(',')
-        else:
-            lst_update_jid = request.GET['jid'].split(',')
-        queue_id = request.GET['queue_id']
-        rds = RdsTool(keys=queue_id)
-        q_result = rds.rds_read_all()
-        print queue_id,q_result
-        result_dict = {}
-        data = {
-            'node_id':[],
-            'msg':[],
-            'result':[]
-        }
-        for q_id in q_result:
-            for jid in lst_update_jid:
-                ret_dict = Get_log.get_job_result(jid,q_id,key=None)
-                print ret_dict
-                if ret_dict:
-                    if type(ret_dict['return']) == type({}):
-                        node_id = ret_dict['node_id']
-                        file_name = os.path.basename(ret_dict['return'].keys()[0])
-                        file_ret =  ret_dict['return'].values()[0]
-                        data['node_id'].append(node_id)
-                        data['msg'].append(file_name)
-                        data['result'].append(file_ret)
-                        result_dict.update(data)
-                    elif type(ret_dict['return']) == type(0):
-                        node_id = ret_dict['node_id']
-                        msg = ""
-                        result = str(ret_dict['return'])
-                        data['node_id'].append(node_id)
-                        data['msg'].append(msg)
-                        data['result'].append(result)
-                        result_dict.update(data)
-                else:
-                    pass
-        list = zip(result_dict['node_id'],result_dict['msg'],result_dict['result'])
-        t = get_template('systack/test.html')
-        c = RequestContext(request,locals())
-        return HttpResponse(t.render(c))
-    except:
-        raise Http404
 
 def test(request):
     if request.method == 'POST':

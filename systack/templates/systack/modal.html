@@ -1,31 +1,37 @@
 <table id="ret_table" class="table table-striped table-bordered table-hover" >
     <thead>
     <tr>
-        <th>区服</th>
-        <th id="a">文件名</th>
-        <th>结果</th>
+        <th id="role">角色</th>
+        <th id="main">服务器</th>
+        <th id="node">区服</th>
+        <th id="file">文件名</th>
+        <th id="result">结果</th>
     </tr>
     </thead>
     <tbody>
-    {% for key, value , result in list %}
+    {% for role, main_id, node_id, value , result in list %}
         <tr>
-            <td>{{ key }}</td>
-            <td id="b">{{ value }}</td>
+            <td id="role_id">{{ role }}</td>
+            <td id="main_id">{{ main_id }}</td>
+            <td id="node_id">{{ node_id }}</td>
+            <td id="value">{{ value }}</td>
             {% if result %}
-            <td><span class="label label-success">成功</span></td>
+                <td><span class="label label-success">成功</span></td>
             {% else %}
-            <td><span class="label label-warning">失败</span></td>
+                <td><span class="label label-warning">失败</span></td>
             {% endif %}
         </tr>
     {% endfor %}
     </tbody>
 </table>
-{% if ret_list %}
-<div class="error-log">
-<ul>
-    {% for log in ret_list %}
-        <li>{{ log }}</li>
-    {% endfor %}
-</ul>
+<div id="log" class="error-log">
+    <ul>
+        {% if ret_list %}
+            {% for log in ret_list %}
+                <li>{{ log }}</li>
+            {% endfor %}
+        {% else %}
+            <h3>暂无日志可查看</h3>
+        {% endif %}
+    </ul>
 </div>
-{% endif %}
