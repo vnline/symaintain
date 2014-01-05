@@ -1,61 +1,62 @@
-<div class="navbar navbar-fixed-top">
-  <div class="navbar-inner">
-    <div class="container">
-      <!-- Menu button for smallar screens -->
-      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-        <span>Menu</span>
-      </a>
-      <!-- Site name for smallar screens -->
-      <a href="index.html" class="brand hidden-desktop">MacBeath</a>
+<div class="navbar navbar-fixed-top bs-docs-nav" role="banner">
 
-      <!-- Navigation starts -->
-      <div class="nav-collapse collapse">        
+    <div class="conjtainer">
+        <!-- Menu button for smallar screens -->
+        <div class="navbar-header">
+            <button class="navbar-toggle btn-navbar" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+                <span>Menu</span>
+            </button>
+            <!-- Site name for smallar screens -->
+            <a href="index.html" class="navbar-brand hidden-lg">MainTian</a>
+        </div>
+        <!-- Navigation starts -->
+        <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
 
-        <ul class="nav">  
+            <ul class="nav navbar-nav">
 
-          <!-- Upload to server link. Class "dropdown-big" creates big dropdown -->
-          <li class="dropdown dropdown-big">
-            <a href="http://s3.app1101102099.qqopenapp.com/admin/login.php" target="_blank"><span class="badge badge-important"><i class="icon-link"></i></span> 游戏管理后台</a>
+                <!-- Upload to server link. Class "dropdown-big" creates big dropdown -->
+                <li class="dropdown dropdown-big">
+                    <a href="http://s3.app1101102099.qqopenapp.com/admin/login.php" target="_blank"><span class="badge badge-important"><i class="icon-link"></i></span> 游戏管理后台</a>
 
-          <!-- Sync to server link -->
-          <li class="dropdown dropdown-big">
-            <a href="http://central.app1101102099.twsapp.com/module/index.php" target="_blank"><span class="badge badge-success"><i class="icon-link"></i></span> 中央后台</a>
+                    <!-- Sync to server link -->
+                <li class="dropdown dropdown-big">
+                    <a href="http://central.app1101102099.twsapp.com/module/index.php" target="_blank"><span class="badge badge-success"><i class="icon-link"></i></span> 中央后台</a>
 
-        </ul>
-
-
-        <!-- Links -->
-        <ul class="nav pull-right">
-          <li class="dropdown pull-right">            
-            <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-              <i class="icon-user"></i> {{ user }} <b class="caret"></b>
-            </a>
-            
-            <!-- Dropdown menu -->
-            <ul class="dropdown-menu">
-              <li><a href="#"><i class="icon-user"></i> Profile</a></li>
-              <li><a href="#"><i class="icon-cogs"></i> Settings</a></li>
-              <li><a href="logout"><i class="icon-off"></i> Logout</a></li>
             </ul>
-          </li>
-          
-        </ul>
-      </div>
+
+
+            <!-- Links -->
+            <ul class="nav navbar-nav pull-right">
+                <li class="dropdown pull-right">
+                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                        <i class="icon-user"></i> {{ user }} <b class="caret"></b>
+                    </a>
+
+                    <!-- Dropdown menu -->
+                    <ul class="dropdown-menu">
+                        <li><a href="#"><i class="icon-user"></i> Profile</a></li>
+                        <li><a href="#"><i class="icon-cogs"></i> Settings</a></li>
+                        <li><a href="logout"><i class="icon-off"></i> Logout</a></li>
+                    </ul>
+                </li>
+
+            </ul>
+        </nav>
 
     </div>
-  </div>
 </div>
-
-<div class="container-fluid">
-      <div class="row-fluid">
-        <!-- Logo section -->
-        <div class="span4">
-          <!-- Logo. -->
-          <div class="logo">
-            <h2><a href="/"><span class="bold">运维管理平台</span></a></h2>
-            <p class="meta">自动一体化，释放你的左右手！</p>
-          </div>
-          <!-- Logo ends -->
+<header>
+    <div class="container">
+        <div class="row">
+            <!-- Logo section -->
+            <div class="col-md-4">
+                <!-- Logo. -->
+                <div class="logo">
+                    <h2><a href="/"><span class="bold">运维管理平台</span></a></h2>
+                    <p class="meta">自动一体化，释放你的左右手！</p>
+                </div>
+                <!-- Logo ends -->
+            </div>
         </div>
-      </div>
-</div>
+    </div>
+</header>

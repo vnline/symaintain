@@ -163,3 +163,73 @@ LOGGING = {
         },
     }
 }
+
+#LOGGING = {
+#    'version': 1,
+#    'disable_existing_loggers': True,
+#    'formatters': {
+#        'standard': {
+#            'format': '%(asctime)s [%(threadName)s:%(thread)d] [%(name)s:%(lineno)d] [%(levelname)s]- %(message)s'
+#        },
+#    },
+#    'filters': {
+#    },
+#    'handlers': {
+#        'mail_admins': {
+#            'level': 'ERROR',
+#            'class': 'django.utils.log.AdminEmailHandler',
+#            'include_html': True,
+#        },
+#        'default': {
+#            'level':'DEBUG',
+#            'class':'logging.handlers.RotatingFileHandler',
+#            'filename': os.path.join('/data/logs/','maintian.log'),
+#            'maxBytes': 1024*1024*5, # 5 MB
+#            'backupCount': 5,
+#            'formatter':'standard',
+#        },
+#        'console':{
+#            'level': 'DEBUG',
+#            'class': 'logging.StreamHandler',
+#            'formatter': 'standard'
+#        },
+#        'request_handler': {
+#            'level':'DEBUG',
+#            'class':'logging.handlers.RotatingFileHandler',
+#            'filename': os.path.join('/data/logs/','script.log'),
+#            'maxBytes': 1024*1024*5, # 5 MB
+#            'backupCount': 5,
+#            'formatter':'standard',
+#        },
+#        'scprits_handler': {
+#            'level':'DEBUG',
+#            'class':'logging.handlers.RotatingFileHandler',
+#            'filename': os.path.join('/data/logs/','script.log'),
+#            'maxBytes': 1024*1024*5, # 5 MB
+#            'backupCount': 5,
+#            'formatter':'standard',
+#        },
+#    },
+#    'loggers': {
+#        'django': {
+#            'handlers': ['default','console'],
+#            'level': 'DEBUG',
+#            'propagate': False
+#        },
+#        'XieYin.app':{
+#            'handlers': ['default','console'],
+#            'level': 'DEBUG',
+#            'propagate': True
+#        },
+#        'django.request': {
+#            'handlers': ['request_handler'],
+#            'level': 'DEBUG',
+#            'propagate': False
+#        },
+#        'scripts': {
+#            'handlers': ['scprits_handler'],
+#            'level': 'INFO',
+#            'propagate': False
+#        },
+#    }
+#}

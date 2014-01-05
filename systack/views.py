@@ -383,7 +383,6 @@ def get_log(request):
     lst_update_jid = request.GET['conf_jids'].split(',')
     if role == "main":
         q_result = Common.get_hosts()
-        print q_result
     else:
         rds = RdsTool()
         q_result = rds.rds_read_all()
@@ -396,7 +395,9 @@ def get_log(request):
         'msg':[],
         'result':[]
     }
+    print q_result
     for q_id in q_result:
+        print q_id
         for jid in lst_update_jid:
             ret_dict = rdl.get_job_result(jid,q_id)
             if ret_dict:
@@ -432,7 +433,6 @@ def get_log(request):
                 else:
                     continue
     try:
-        print result_dict
         list = zip(result_dict['role'],result_dict['main_id'],result_dict['node_id'],result_dict['msg'],result_dict['result'])
     except Exception:
         list = [('None','None','None',False)]

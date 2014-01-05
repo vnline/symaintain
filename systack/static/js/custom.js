@@ -7,7 +7,7 @@ $(document).ready(function(){
 
   $(window).resize(function()
   {
-    if($(window).width() > 768){
+    if($(window).width() >= 765){
       $(".sidebar #nav").slideDown(350);
     }
     else{
@@ -157,7 +157,7 @@ $('.wclose').click(function(e){
 
     setTimeout(function(){
 
-        $('.progress-animated .bar').each(function() {
+        $('.progress-animated .progress-bar').each(function() {
             var me = $(this);
             var perc = me.attr("data-percentage");
 
@@ -263,60 +263,10 @@ $(document).ready(function(){
 
   $(function() {
     $('#datetimepicker1').datetimepicker({
-      pickTime: false
+      pickTime: true,
+      language: 'zh-CN'
     });
   });
-
-   $(function() {
-    $('#datetimepicker2').datetimepicker({
-      pickDate: false
-    });
-  });
-
-
-/* Bootstrap toggle */
-
-$('.toggle-button').toggleButtons({
-    style: {
-        // Accepted values ["primary", "danger", "info", "success", "warning"] or nothing
-        enabled: "danger"
-    }
-});
-
-$('.warning-toggle-button').toggleButtons({
-    width:130,
-    style: {
-        // Accepted values ["primary", "danger", "info", "success", "warning"] or nothing
-        enabled: "success",
-        disabled: "danger"
-    },
-    label: {
-        enabled: "Enabled",
-        disabled: "Disabled"
-    }
-});
-
-$('.info-toggle-button').toggleButtons({
-    style: {
-        // Accepted values ["primary", "danger", "info", "success", "warning"] or nothing
-        enabled: "info"
-    }
-});
-
-$('.success-toggle-button').toggleButtons({
-    style: {
-        // Accepted values ["primary", "danger", "info", "success", "warning"] or nothing
-        enabled: "warning"
-    }
-});
-
-
-/* Uniform - Form Styleing */
-
-$(document).ready(function() {
-  $(".uni select, .uni input, .uni textarea").uniform();
-});
-
 
 /* CL Editor */
 
@@ -328,3 +278,9 @@ $(".cleditor").cleditor({
 /* Modal fix */
 
 $('.modal').appendTo($('body'));
+
+/* Pretty Photo for Gallery*/
+
+jQuery("a[class^='prettyPhoto']").prettyPhoto({
+overlay_gallery: false, social_tools: false
+});

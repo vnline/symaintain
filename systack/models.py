@@ -31,7 +31,6 @@ class Deliver(models.Model):
     target = models.CharField(max_length=20)
     files = models.TextField(max_length=200)
     jids = models.TextField(max_length=200, blank=True)
-    result = models.TextField(max_length=500, blank=True)
     deployed_by = models.CharField(max_length=20,blank = True)
     mtime = models.DateTimeField(auto_now = True)
 
@@ -45,7 +44,6 @@ class Hotfile(models.Model):
     target = models.CharField(max_length=20)
     files = models.TextField(max_length=200)
     jids = models.TextField(max_length=200, blank=True)
-    result = models.TextField(max_length=500, blank=True)
     deployed_by = models.CharField(max_length=20,blank = True)
     mtime = models.DateTimeField(auto_now = True)
 
@@ -64,7 +62,6 @@ class Deploy(models.Model):
     cgm = models.BooleanField()
     deployed_by = models.CharField(max_length=20, blank=True)
     jids = models.TextField(max_length=200, blank=True)
-    result = models.TextField(max_length=500, blank=True)
     mtime = models.DateTimeField(auto_now = True)
 
     class Meta:
@@ -74,12 +71,12 @@ class Deploy(models.Model):
         return self.deploy_name
 
 
+
 class Operation(models.Model):
     target = models.CharField(max_length=20)
     cmd = models.CharField(max_length=200)
     deployed_by = models.CharField(max_length=20)
     jids = models.TextField(max_length=200, blank=True)
-    result = models.TextField(max_length=200, blank=True)
     mtime = models.DateTimeField(auto_now = True)
 
     def __unicode__(self):
