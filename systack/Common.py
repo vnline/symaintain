@@ -81,9 +81,14 @@ def command(as_role,target,cmd,arg,*args,**kwargs):
                 jid = cli.game_tools.hot_file(arg)
             elif cmd == "change_client_version":
                 jid = cli.game_tools.change_client_version(arg)
+            elif cmd == "func":
+                print arg
+                jid = cli.game_tools.func(arg)
         elif as_role == "main":
             if cmd == "ping":
                 jid = cli.main_sys.ping()
+            elif cmd == "start_game":
+                jid = cli.start_game.do(arg,**kwargs)
     except:
         jid = None
     return jid
@@ -151,6 +156,17 @@ class RdsLog(object):
         ret = {}
         try:
             ret = msgpack.loads(self.redis.hget(jid,node_id))
+        except:
+            pass
+        return ret
+
+    def get_game_log(self,jid,node_id):
+        """
+        从redis直接读取游戏安装的结果
+        """
+        ret = {}
+        try:
+            ret = self.redis.hget(jid,node_id)
         except:
             pass
         return ret

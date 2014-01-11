@@ -170,6 +170,7 @@ def logout(request):
 @login_required(login_url='account_login')
 def schedule(request):
     if request.method == 'POST':
+        print request.POST
         schedule = Schedule()
         form = ScheduleForm(request.POST,instance=schedule)
         if form.is_valid():
@@ -444,14 +445,15 @@ def get_log(request):
 @login_required(login_url='account_login')
 def game_log(request):
     ret = {}
+    rdl = RdsLog(db='0')
     try:
         if request.GET.has_key('deploy'):
             jid = request.GET.get('deploy')
-            id = ""
-            ret = Get_log.get_job_result(jid,id,key='init_game')
+            print jid
+            ret = rdl.get_game_log('install_game',jid)
             ret_list = ret.split('#')
-    except:
-        pass
+    except Exception,e:
+        print e
     t = get_template('systack/modal.html')
     c = RequestContext(request,locals())
     return HttpResponse(t.render(c))

@@ -203,6 +203,7 @@ form label{
 	line-height: 15px;
 }
 
+
 .form-inline button{
 	margin-left: 15px;
 }
@@ -212,7 +213,7 @@ font-size:12px;
 }
 
 .form-horizontal .control-label {
-width: 90px;
+width: 110px;
 }
 
 .form-horizontal .controls {
@@ -451,7 +452,7 @@ text-decoration:none;
 }
 
 .dropdown-menu li > a:hover{
-	background: #f3f3f3 !important;
+	background: #46b8da !important;
 	filter:none;
 	color: #777;
 }
